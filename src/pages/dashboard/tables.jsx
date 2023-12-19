@@ -100,7 +100,6 @@ export function Tables() {
         });
       }
 
-      // Separate incomplete and completed users
       const incomplete = userProgressData.filter(
         (user) => user.moduleProgress !== 100,
       );
@@ -205,10 +204,9 @@ export function Tables() {
     }
   };
 
-  const canSendInvitation = completedUsers.length >= 30;
+  const canSendInvitation = completedUsers.length >= 2;
   return (
     <div className="mt-12 mb-8 flex flex-col gap-12">
-      {/* USERS TABLE */}
       <Card>
         <CardHeader variant="gradient" color="blue" className="mb-8 p-6">
           <Typography variant="h6" color="white">
@@ -246,7 +244,6 @@ export function Tables() {
                   <tr key={key}>
                     <td className={className}>
                       <div className="flex items-center gap-4">
-                        {/* <Avatar src={img} alt={name} size="sm" /> */}
                         <div>
                           <Typography
                             variant="small"
@@ -328,7 +325,6 @@ export function Tables() {
           </table>
         </CardBody>
       </Card>
-      {/* USERS COMPLETERS TABLE */}
       <Card>
         <CardHeader
           variant="gradient"
@@ -387,7 +383,6 @@ export function Tables() {
                   <tr key={key}>
                     <td className={className}>
                       <div className="flex items-center gap-4">
-                        {/* <Avatar src={img} alt={name} size="sm" /> */}
                         <div>
                           <Typography
                             variant="small"
@@ -469,7 +464,6 @@ export function Tables() {
           </table>
         </CardBody>
       </Card>
-      {/* USER DIALOG */}
       <Dialog open={open} handler={handleOpen} size="lg">
         <Card className="mt-6">
           {selectedUserData && (
@@ -551,7 +545,6 @@ export function Tables() {
           </CardFooter>
         </Card>
       </Dialog>
-      {/* INVITATION DIALOG */}
       <Dialog
         size="xs"
         open={openInvitation}
@@ -637,7 +630,6 @@ export function Tables() {
           </form>
         </Card>
       </Dialog>
-      <ToastContainer />
     </div>
   );
 }

@@ -31,7 +31,6 @@ import {
   Checkbox,
 } from "@material-tailwind/react";
 import { TabView, TabPanel } from "primereact/tabview";
-// import { Checkbox } from "primereact/checkbox";
 
 import {
   collection,
@@ -52,6 +51,7 @@ import {
 } from "firebase/storage";
 
 import { db, storage } from "../../../firebase-config";
+import { toast } from "react-toastify";
 
 const TABS = [
   {
@@ -80,8 +80,6 @@ const TABLE_HEAD = [
   "Edit",
   "Delete",
 ];
-
-// TODO: FIX THE DRAWER TAB AND BADGE CHECKBOX
 
 export function Modules() {
   const [open, setOpen] = useState(false);
@@ -112,7 +110,7 @@ export function Modules() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [moduleFileName, setModuleFileName] = useState("");
   const [selectedBadgeFile, setSelectedBadgeFile] = useState(null);
-  const [badgeFileName, setBadgeFileName] = useState(""); // State for badge file name
+  const [badgeFileName, setBadgeFileName] = useState("");
 
   const fetchData = async () => {
     try {
@@ -149,7 +147,13 @@ export function Modules() {
   }, []);
 
   const openDrawer = (moduleData) => {
-    setSelectedModule(moduleData);
+    setSelectedModule({
+      ...moduleData,
+      moduleID: `module${moduleData.module}-${
+        moduleData.difficulty.split("-")[0]
+      }`,
+    });
+    console.log(moduleData);
     setFormData({
       topic: moduleData?.topic || "",
       module: moduleData?.module || "",
@@ -193,8 +197,7 @@ export function Modules() {
             console.error("Error loading badge image URL:", error);
           });
       }
-      setUrlVideo(moduleData.sourcePath || ""); // Initialize videoURL with sourcePath
-      // setYoutubeKey(prevKey => prevKey + 1);
+      setUrlVideo(moduleData.sourcePath || "");
     }
 
     const tab = moduleData.moduleType === "module" ? "module" : "video";
@@ -233,7 +236,6 @@ export function Modules() {
       console.log(newValue);
       setSearchedData(newValue);
     } else {
-      // Update the formData with the selected Table Header value
       setFormData((prevData) => ({
         ...prevData,
         [fieldName]: newValue,
@@ -250,7 +252,6 @@ export function Modules() {
     row.topic.toLowerCase().includes(searchedData.toLowerCase()),
   );
 
-  // PDF UPLOAD
   const handleBadgeFileInputChange = (e) => {
     const file = e.target.files[0];
     const fileName = file.name;
@@ -270,7 +271,7 @@ export function Modules() {
 
   const handleModuleFileInputChange = (e) => {
     const file = e.target.files[0];
-    const fileName = new Date().getTime() + file.name;
+    const fileName = file.name + new Date().getTime();
     setSelectedFile(file);
     setModuleFileName(fileName);
     setFormData((prevData) => ({
@@ -289,7 +290,9 @@ export function Modules() {
         !formData.difficulty ||
         !formData.sourcePath
       ) {
-        alert("Please fill in all required fields.");
+        toast.error("Please fill in all required fields.", {
+          position: "top-left",
+        });
         return;
       }
     } else {
@@ -300,13 +303,17 @@ export function Modules() {
         !formData.sourcePath ||
         !formData.videoDescription
       ) {
-        alert("Please fill in all required fields.");
+        toast.error("Please fill in all required fields.", {
+          position: "top-left",
+        });
         return;
       }
     }
 
     if (checked && !formData.badgePath) {
-      alert("Please upload an image when the checkbox is checked.");
+      toast.error("Please upload an image when the checkbox is checked.", {
+        position: "top-left",
+      });
       return;
     }
 
@@ -314,8 +321,7 @@ export function Modules() {
     const difficultyID = formData.difficulty.split("-")[0];
     const moduleCollectionRef = collection(db, "modules-datas");
 
-    // ADD TO FIREBASE
-    formData.moduleType = selectedTableHeader.toLowerCase(); // USE selectedTabHeader IF THE MODULE TYPE IS ALWAYS `MODULE`
+    formData.moduleType = selectedTableHeader.toLowerCase();
 
     try {
       if (isEdit) {
@@ -325,9 +331,11 @@ export function Modules() {
 
         if (
           moduleDocSnapshot.exists() &&
-          moduleDocSnapshot.id !== updatedDocumentID
+          moduleDocSnapshot.id !== selectedModule.moduleID
         ) {
-          alert(`Module ${updatedDocumentID} already exist.`);
+          toast.error(`Module ${updatedDocumentID} already exist.`, {
+            position: "top-left",
+          });
           return;
         }
 
@@ -336,6 +344,7 @@ export function Modules() {
             ...formData,
             module: documentID,
           });
+          toast.success("Edited Successfully!");
           closeDrawer();
           return;
         }
@@ -367,48 +376,48 @@ export function Modules() {
           }
 
           await updateDoc(moduleDocRef, { badgePath: badgeDownloadURL });
+          toast.success("Edited Successfully!");
           closeDrawer();
           return;
         }
 
         if (formData.sourcePath !== selectedModule.sourcePath) {
-          // Only update sourcePath if it has changed
-          const storageRef = ref(storage, formData.sourcePath);
-          const fileSnapshot = await uploadBytes(storageRef, selectedFile);
-          const downloadURL = await getDownloadURL(storageRef);
-
-          const filePath = selectedModule.sourcePath;
-          const fileRef = ref(storage, filePath);
-          await deleteObject(fileRef);
-
-          await updateDoc(moduleDocRef, { sourcePath: downloadURL });
+          if (formData.moduleType === "module") {
+            const storageRef = ref(storage, formData.sourcePath);
+            const fileSnapshot = await uploadBytes(storageRef, selectedFile);
+            const downloadURL = await getDownloadURL(storageRef);
+            const filePath = selectedModule.sourcePath;
+            const fileRef = ref(storage, filePath);
+            await deleteObject(fileRef);
+            await updateDoc(moduleDocRef, { sourcePath: downloadURL });
+            toast.success("Edited Successfully!");
+            closeDrawer();
+            return;
+          }
+          await updateDoc(moduleDocRef, { ...formData });
+          toast.success("Edited Successfully!");
           closeDrawer();
           return;
         }
 
-        // ! FIXME: UPDATING ISSUE. IT REPLACES THE EXISITING MODULE/VIDEO
         const ogModuleID = selectedModule.module;
         const ogDifficultyID = selectedModule.difficulty.split("-")[0];
         const ogDocumentID = `module${ogModuleID}-${ogDifficultyID}`;
 
-        //* DELETE SOURCE PATH
         if (formData.moduleType === "module") {
           const filePath = selectedModule.sourcePath;
           const fileRef = ref(storage, filePath);
           await deleteObject(fileRef);
         }
 
-        //* DELETE BADGE PATH
         if (selectedModule.badgePath) {
           const badgeFileRef = ref(storage, selectedModule.badgePath);
           await deleteObject(badgeFileRef);
         }
 
-        //* DELETE OG DATA
         const ogDocRef = doc(db, "modules-datas", ogDocumentID);
         await deleteDoc(ogDocRef);
 
-        //* SET NEW DATA FOR VIDEO TYPE
         if (formData.moduleType === "video") {
           await setDoc(moduleDocRef, {
             ...formData,
@@ -418,14 +427,12 @@ export function Modules() {
           return;
         }
 
-        //* SET NEW DATA FOR MODULE TYPE
         const storageRef = ref(storage, formData.sourcePath);
         const fileSnapshot = await uploadBytes(storageRef, selectedFile);
         const downloadURL = await getDownloadURL(storageRef);
 
         let badgeDownloadURL;
 
-        // Check if the checkbox is checked and badgePath exists
         if (checked && formData.badgePath) {
           const badgeStorageRef = ref(storage, formData.badgePath);
           const badgeFileSnapshot = await uploadBytes(
@@ -436,13 +443,13 @@ export function Modules() {
           badgeDownloadURL = await getDownloadURL(badgeStorageRef);
         }
 
-        // FIXME: ADDED (MIGHT CAUSE BUGS)
         await setDoc(moduleDocRef, {
           ...formData,
           module: documentID,
           sourcePath: downloadURL,
           badgePath: badgeDownloadURL || "",
         });
+        toast.success("Edited Successfully", { position: "top-right" });
 
         closeDrawer();
       } else {
@@ -451,7 +458,9 @@ export function Modules() {
         const moduleDocSnapshot = await getDoc(moduleDocRef);
 
         if (moduleDocSnapshot.exists()) {
-          alert(`Module ${newDocumentID} already exists!`);
+          toast.warn(`Module ${newDocumentID} already exists!`, {
+            position: "top-left",
+          });
           return;
         }
 
@@ -480,6 +489,7 @@ export function Modules() {
             ...formData,
             module: documentID,
           });
+          toast.success("Module data added successfully!");
           closeDrawer();
           return;
         } else {
@@ -505,7 +515,9 @@ export function Modules() {
               sourcePath: sourceDownloadURL,
             });
           }
+          toast.success("Module data added successfully!");
         }
+
         closeDrawer();
       }
     } catch (error) {
@@ -525,7 +537,7 @@ export function Modules() {
         const moduleType = moduleData.moduleType;
 
         if (moduleType === "module") {
-          const filePath = moduleData.sourcePath; // Use the sourcePath directly
+          const filePath = moduleData.sourcePath;
           const fileRef = ref(storage, filePath);
           await deleteObject(fileRef);
         }
@@ -543,7 +555,7 @@ export function Modules() {
         );
 
         await deleteDoc(moduleDocRef);
-
+        toast.success("Deleted Successfully!");
         updateModuleDataAfterDelete(moduleData);
       } catch (error) {
         console.error("Error deleting document: ", error);
@@ -557,7 +569,6 @@ export function Modules() {
     );
   };
 
-  // YOUTUBE VIDEO FETCHING
   const [videoURL, setUrlVideo] = useState("");
   const handlePaste = (event) => {
     setUrlVideo(event.clipboardData.getData("text").split("v=")[1]);
@@ -776,7 +787,6 @@ export function Modules() {
                     handleInputChange("videoDescription", e.target.value)
                   }
                 />
-                {/* <Input label="Video Description" /> */}
               </div>
               <div className="mb-4">
                 <div className="">
@@ -788,8 +798,8 @@ export function Modules() {
                     name="badge"
                     value="badge"
                     onChange={(e) => {
-                      setChecked(e.checked);
-                      setBadgeChecked(e.checked);
+                      setChecked(e.target.checked);
+                      setBadgeChecked(e.target.checked);
                     }}
                     checked={checked}
                   />
@@ -821,19 +831,6 @@ export function Modules() {
               </div>
               <div className="mb-4 flex justify-around">
                 <Card className="mt-5 w-full">
-                  {/* <CardHeader
-                    color="blue-gray"
-                    className="relative h-26 w-25rem]"
-                  >
-                    <YouTube
-                      videoId={videoURL || formData.sourcePath}
-                      key={youtubeKey}
-                      opts={{
-                        height: '300',
-                        width: '100%',
-                      }}
-                    />
-                  </CardHeader> */}
                   <CardFooter className="mt-5 pt-0 flex justify-center">
                     <Input
                       type="text"
@@ -879,6 +876,7 @@ export function Modules() {
               <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
                 <Button
                   className="flex items-center gap-3"
+                  color="light-blue"
                   size="sm"
                   onClick={() => {
                     setOpen(true);
@@ -1016,7 +1014,7 @@ export function Modules() {
                         <Tooltip content="Edit Module">
                           <IconButton
                             variant="text"
-                            onClick={() => openDrawer(rowData)} // Pass the rowData to the openDrawer function
+                            onClick={() => openDrawer(rowData)}
                           >
                             <PencilIcon className="h-4 w-4" />
                           </IconButton>

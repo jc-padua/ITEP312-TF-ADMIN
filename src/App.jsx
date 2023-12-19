@@ -3,6 +3,7 @@ import { Dashboard, Auth } from "@/layouts";
 import { Spinner } from "@material-tailwind/react";
 import { useEffect, useState } from "react";
 import { auth } from "../firebase-config";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -28,23 +29,26 @@ function App() {
   }
 
   return (
-    <Routes>
-      <Route
-        path="/dashboard/*"
-        element={user ? <Dashboard /> : <Navigate to="/auth/sign-in" />}
-      />
-      <Route path="/auth/*" element={<Auth />} />
-      <Route
-        path="*"
-        element={
-          user ? (
-            <Navigate to="/dashboard/home" replace />
-          ) : (
-            <Navigate to="/auth/sign-in" replace />
-          )
-        }
-      />
-    </Routes>
+    <>
+      <ToastContainer />
+      <Routes>
+        <Route
+          path="/dashboard/*"
+          element={user ? <Dashboard /> : <Navigate to="/auth/sign-in" />}
+        />
+        <Route path="/auth/*" element={<Auth />} />
+        <Route
+          path="*"
+          element={
+            user ? (
+              <Navigate to="/dashboard/home" replace />
+            ) : (
+              <Navigate to="/auth/sign-in" replace />
+            )
+          }
+        />
+      </Routes>
+    </>
   );
 }
 

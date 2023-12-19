@@ -54,7 +54,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
           <Typography variant="h6" color={"blue-gray"}>
             {brandName}
           </Typography>
-        </Link>
+        </Link> 
         <IconButton
           variant="text"
           color="blue-gray"

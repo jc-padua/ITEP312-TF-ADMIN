@@ -95,7 +95,6 @@ export function Home() {
   const [feedbackData, setFeedbackData] = useState([]);
   const [triviaData, setTriviaData] = useState([]);
 
-  // USER PAGINATION
   const itemsPerPage = 6;
   const totalPages = Math.ceil(userProgress.length / itemsPerPage);
   const [currentPage, setCurrentPage] = useState(1);
@@ -110,7 +109,6 @@ export function Home() {
     startIndex + itemsPerPage,
   );
 
-  // EVENT PAGINATION
   const eventItemsPerPage = 6;
   const eventTotalPages = Math.ceil(eventsData.length / eventItemsPerPage);
   const [eventCurrentPage, setEventCurrentPage] = useState(1);
@@ -125,7 +123,6 @@ export function Home() {
     eventStartIndex + eventItemsPerPage,
   );
 
-  // TRIVIA PAGINATION
   const triviaItemsPerPage = 5;
   const triviaTotalPages = Math.ceil(triviaData.length / triviaItemsPerPage);
   const [triviaCurrentPage, setTriviaCurrentPage] = useState(1);
@@ -406,7 +403,7 @@ export function Home() {
       },
       xaxis: {
         ...chartsConfig.xaxis,
-        categories: uniqueAges.map(String), // Convert unique ages to strings for X-axis labels
+        categories: uniqueAges.map(String),
       },
     },
   };
@@ -430,7 +427,7 @@ export function Home() {
       labels: ["Male", "Female"],
       legend: {
         show: true,
-        position: "right", // Display legend on the right side
+        position: "right",
         horizontalAlign: "center",
         verticalAlign: "middle",
         formatter: function (seriesName) {
@@ -442,7 +439,7 @@ export function Home() {
         },
       },
       dataLabels: {
-        enabled: true, // Disable data labels
+        enabled: true,
       },
       responsive: [
         {
@@ -453,7 +450,7 @@ export function Home() {
             },
             legend: {
               show: true,
-              position: "bottom", // Display legend at the bottom on small screens
+              position: "bottom",
             },
           },
         },
@@ -525,9 +522,7 @@ export function Home() {
       id: "lineGraph",
       color: "pink",
       title: "Users Total",
-      // description: "15% increase in today sales",
       description: "Total number of user per month",
-      // footer: "updated 4 min ago",
       footer: "sample live update preview",
       chart: userTotalChart,
     },
@@ -535,9 +530,7 @@ export function Home() {
       id: "barGraph",
       color: "blue",
       title: "User Age Graph",
-      // description: "Last Campaign Performance",
       description: "Users that uses the application by age",
-      // footer: "campaign sent 2 days ago",
       footer: "sample live update preview",
       chart: ageViewChart,
     },
@@ -545,9 +538,7 @@ export function Home() {
       id: "pieGraph",
       color: "green",
       title: "User Gender Graph",
-      // description: "Last Campaign Performance",
       description: "Users gender count",
-      // footer: "just updated",
       footer: "sample live update preview",
       chart: genderChart,
     },
@@ -555,9 +546,7 @@ export function Home() {
       id: "pieGraph2",
       color: "orange",
       title: "Users Knowledge about Sex Education",
-      // description: "Last Campaign Performance",
       description: "Users that uses the application by age",
-      // footer: "campaign sent 2 days ago",
       footer: "sample live update preview",
       chart: surveyChart,
     },
@@ -835,8 +824,8 @@ export function Home() {
         doc.setDrawColor(200, 200, 200);
         doc.line(startX, 600, endX, 600);
 
-        // INTERPRETATION
-        //TODO: ADD INTERPRETATION
+        //TODO:
+        //! INTERPRETATION
         doc.text("Interpretation", 40, 650);
 
         window.open(doc.output("bloburl"));
@@ -885,22 +874,10 @@ export function Home() {
                 Data Statistics
               </Typography>
             </div>
-            {/* {userMonthTotal && userAge && userGender && surveyAnswers && (
-              <div className="rounded-md">
-                <BlobProvider document={<ReportDocument />}>
-                  {({ url, blob }) => (
-                    <a href={url} target="_blank">
-                      <Button color="light-green">Generate Report</Button>
-                    </a>
-                  )}
-                </BlobProvider>
-              </div>
-            )} */}
 
             <Button variant="gradient" color="green" onClick={handleDownload}>
               Generate Report
             </Button>
-            {/* <Button onClick={() => toPDF()}>Save Chart Image</Button> */}
           </CardHeader>
           <CardBody
             ref={targetRef}
@@ -918,9 +895,6 @@ export function Home() {
           </CardBody>
         </Card>
       </div>
-      {/* 
-      //* RECENT USERS
-      */}
       <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <Card className="overflow-hidden xl:col-span-2">
           <CardHeader
@@ -974,7 +948,6 @@ export function Home() {
                       <tr key={key}>
                         <td className={className}>
                           <div className="flex items-center gap-4">
-                            {/* <Avatar src={img} alt={name} size="sm" /> */}
                             <Typography
                               variant="small"
                               color="blue-gray"

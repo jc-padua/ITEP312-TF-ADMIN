@@ -9,6 +9,7 @@ import {
   Input,
   Chip,
   Drawer,
+  Switch,
 } from "@material-tailwind/react";
 import { ProfileInfoCard, MessageCard } from "@/widgets/cards";
 import { platformSettingsData, conversationsData, projectsData } from "@/data";
@@ -39,6 +40,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { ToastContainer, toast } from "react-toastify";
+import { data } from "autoprefixer";
 
 export function Profile() {
   const [currentUser, setCurrentUser] = useState({
@@ -46,7 +48,6 @@ export function Profile() {
     email: "",
     name: "",
     phoneNumber: "",
-    role: "",
   });
 
   const [otherUsers, setOtherUsers] = useState([]);
@@ -179,6 +180,7 @@ export function Profile() {
   };
 
   const [openOtherUserDialog, setOpenOtherUserDialog] = useState(false);
+  const [selectedOtherUser, setSelectedOtherUser] = useState({});
 
   const handleOpenOtherUserDialog = (data) => {
     setOpenOtherUserDialog(!openOtherUserDialog);
@@ -186,9 +188,42 @@ export function Profile() {
     if (openOtherUserDialog) {
       setSelectedOtherUser({});
     }
+    setSwitchState(data.userValidated);
   };
 
-  const [selectedOtherUser, setSelectedOtherUser] = useState({});
+  const [switchState, setSwitchState] = useState(
+    selectedOtherUser.userValidated || false,
+  );
+
+  const updateUserValidity = async (selectedUser, value) => {
+    try {
+      const otherDataQuery = collection(db, "admin-datas");
+      const otherDataSnapshot = await getDocs(otherDataQuery);
+      const otherUserData = otherDataSnapshot.docs
+        .map((doc) => doc.data())
+        .find((data) => data.email === selectedUser.email);
+
+      if (otherUserData) {
+        const otherDocRef = doc(db, "admin-datas", selectedUser.id);
+        await setDoc(otherDocRef, {
+          ...otherUserData,
+          userValidated: value,
+        });
+
+        setSwitchState(value);
+
+        toast.success(
+          `${selectedOtherUser.name} can now ${
+            value ? "access" : "no longer access"
+          } the admin platform`,
+        );
+        fetchUsers();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <Card className="mt-12 mb-8 flex flex-col gap-12">
@@ -247,8 +282,8 @@ export function Profile() {
                 {otherUsers.map((props) => (
                   <MessageCard
                     key={props.name}
-                    acctype={props.role}
                     {...props}
+                    isValidated={props.userValidated}
                     action={
                       <Button
                         variant="text"
@@ -399,10 +434,6 @@ export function Profile() {
             <Typography variant="h5" className="mb-2">
               {selectedOtherUser.name || ""}
             </Typography>
-            <Chip
-              value={selectedOtherUser.role || ""}
-              className="max-w-[3.3rem] mb-5"
-            />
             <Typography variant="lead" className="mb-4">
               Other Details
             </Typography>
@@ -418,6 +449,26 @@ export function Profile() {
               <MapPinIcon className="w-4" />
               {selectedOtherUser.address || ""}
             </Typography>
+            <div className="mt-2">
+              {selectedOtherUser?.role === "admin" ? (
+                ""
+              ) : (
+                <Switch
+                  checked={switchState}
+                  label={switchState ? "Disable User" : "Enable User"}
+                  className="h-full w-full checked:bg-[#2ec946]"
+                  containerProps={{
+                    className: "w-11 h-6",
+                  }}
+                  circleProps={{
+                    className: "before:hidden left-0.5 border-none",
+                  }}
+                  onChange={(e) => {
+                    updateUserValidity(selectedOtherUser, e.target.checked);
+                  }}
+                />
+              )}
+            </div>
           </div>
           <img
             src="../../../public/img/ydao.png"
@@ -431,8 +482,6 @@ export function Profile() {
           />
         </div>
       </Dialog>
-
-      <ToastContainer />
     </>
   );
 }

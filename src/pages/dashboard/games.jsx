@@ -35,6 +35,7 @@ import {
   onSnapshot,
   setDoc,
 } from "firebase/firestore";
+import { toast } from "react-toastify";
 
 const TABS = [
   {
@@ -80,12 +81,10 @@ const initialWordleItem = {
 };
 
 export function Games() {
-  // TABLE HOOKS
   const [selectedTab, setSelectedTab] = useState("all");
   const [searchedData, setSearchedData] = useState("");
   const [moduleData, setModuleData] = useState([]);
 
-  // DRAWER HOOKS
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     difficulty: "",
@@ -97,12 +96,10 @@ export function Games() {
   const [selectedData, setSelectedData] = useState(null);
   const [isEdit, setIsEdit] = useState(false);
 
-  // GameTypeForm Hooks
   const [quizItems, setQuizItems] = useState([initialQuizItem]);
   const [validationErrors, setValidationErrors] = useState([]);
   const [wordleItems, setWordleItems] = useState([initialWordleItem]);
 
-  // TABLE FUNCTIONS & VARIABLES
   const fetchData = async () => {
     try {
       const moduleDocRef = await getDocs(collection(db, "games-datas"));
@@ -178,8 +175,6 @@ export function Games() {
       }));
     }
   };
-
-  // DRAWER FUNCTIONS & VARIABLES
 
   const openDrawer = (moduleData) => {
     setOpen(true);
@@ -301,18 +296,6 @@ export function Games() {
               <p className="text-red-500 text-xs">{validationErrors.optionD}</p>
             </div>
             <div className="mb-4">
-              {/* <Select
-                label="Answer"
-                value={quizItem?.answer}
-                onChange={(newValue) =>
-                  handleInputChange("answer", newValue, "quiz", index)
-                }
-              >
-                <Option value={quizItem.optionA}>Choice 1</Option>
-                <Option value={quizItem.optionB}>Choice 2</Option>
-                <Option value={quizItem.optionC}>Choice 3</Option>
-                <Option value={quizItem.optionD}>Choice 4</Option>
-              </Select> */}
               <Typography variant="paragraph">Answer</Typography>
               <Radio
                 label="Choice 1"
@@ -499,18 +482,14 @@ export function Games() {
       return;
     }
 
-    // Create a new object for formData with the updated quiz field
     const updatedFormData = {
       ...formData,
       quiz: [...quizItems],
       wordle: [...wordleItems],
     };
 
-    // Add to Firebase
-    const collectionRef = collection(db, "games-datas"); // Database to Store
+    const collectionRef = collection(db, "games-datas");
 
-    // FIXME: IF YOU WANT TO APPLY THE RANDOM GAME FUNCTIONALITY ON DEVICE THEN USE GAMETYPE AS YOUR DOCID
-    // const gameType = updatedFormData.gameType;
     const module = updatedFormData.gameModule;
     const difficulty = updatedFormData.difficulty;
     const docID = `game${module}-${difficulty}`;
@@ -519,29 +498,37 @@ export function Games() {
       if (isEdit) {
         const gameDocRef = doc(collectionRef, docID);
         const gameDocSnapshot = await getDoc(gameDocRef);
-        if (gameDocSnapshot.exists() && gameDocSnapshot.id !== docID) {
-          alert(`Game ${docID} already exist.`);
+        if (
+          gameDocSnapshot.exists() &&
+          gameDocSnapshot.id !== selectedData.gameID
+        ) {
+          toast.warn(`Game ${docID} already exist.`);
           return;
+        } else {
+          const gameID = selectedData.gameModule;
+          const difficulty = selectedData.difficulty;
+          const gameDocID = `game${gameID}-${difficulty}`;
+
+          const ogDocRef = doc(db, "games-datas", gameDocID);
+          await deleteDoc(ogDocRef);
+          await setDoc(gameDocRef, updatedFormData).then(() =>
+            toast.success("Game data edited successfully!"),
+          );
+
+          closeDrawer();
         }
-
-        const gameID = selectedData.gameModule;
-        const difficulty = selectedData.difficulty;
-        const gameDocID = `game${gameID}-${difficulty}`;
-
-        // DELETE OG
-        const ogDocRef = doc(db, "games-datas", gameDocID);
-        await deleteDoc(ogDocRef);
-
-        await setDoc(gameDocRef, updatedFormData);
-
-        closeDrawer();
       } else {
-        const docRef = doc(collectionRef, docID); // Document to Store
-        const docSnapshot = await getDoc(docRef); // Use getDoc to check if the document exists
+        const docRef = doc(collectionRef, docID);
+        const docSnapshot = await getDoc(docRef);
         if (docSnapshot.exists()) {
-          alert(`Game ${docID} data already exists`);
+          toast.warn(`Game ${docID} data already exists`, {
+            position: "top-left",
+          });
         } else {
           await setDoc(docRef, updatedFormData);
+          toast.success(`Game ${docID} data added!`, {
+            position: "top-right",
+          });
           closeDrawer();
         }
       }
@@ -567,6 +554,7 @@ export function Games() {
         );
 
         await deleteDoc(gameDocRef);
+        toast.success("Deleted Successfully");
       } catch (error) {
         console.error("Error deleting document: ", error);
       }
@@ -576,7 +564,7 @@ export function Games() {
   return (
     <section className=" p-5">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-4xl">Manage Games</h1>
+        <h1 className="text-4xl">Manage Games Data</h1>
       </div>
       <div className="flex">
         <Card className="h-full w-full">
@@ -595,6 +583,7 @@ export function Games() {
                 <Button
                   className="flex items-center gap-3"
                   size="sm"
+                  color="light-blue"
                   onClick={() => {
                     setOpen(true);
                   }}
@@ -731,7 +720,7 @@ export function Games() {
                         <Tooltip content="Edit Module">
                           <IconButton
                             variant="text"
-                            onClick={() => openDrawer(rowData)} // Pass the rowData to the openDrawer function
+                            onClick={() => openDrawer(rowData)}
                           >
                             <PencilIcon className="h-4 w-4" />
                           </IconButton>

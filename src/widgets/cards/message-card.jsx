@@ -18,12 +18,16 @@ function Icon() {
   );
 }
 
-export function MessageCard({ acctype, name, action }) {
+export function MessageCard({ name, action, isValidated }) {
   return (
     <div className="flex items-center justify-between gap-4">
       <div className="flex items-center gap-4">
-        <Chip value={acctype} icon={<Icon />} />
-        <div>
+        <Chip
+          value={!isValidated ? "Pending" : "Active"}
+          color={!isValidated ? "blue-gray" : "light-green"}
+        />
+        <Icon />
+        <div className="flex items-center">
           <Typography
             variant="small"
             color="blue-gray"

@@ -1,36 +1,28 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Card,
   CardHeader,
   CardBody,
   CardFooter,
   Input,
-  Checkbox,
   Button,
   Typography,
   Spinner,
-  Select,
-  Option,
 } from "@material-tailwind/react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import { auth, db } from "../../../firebase-config";
-import {
-  Timestamp,
-  addDoc,
-  collection,
-  serverTimestamp,
-} from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { ToastContainer, toast } from "react-toastify";
 export function SignUp() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    displayName: "",
     phoneNumber: "",
     address: "",
-    role: "",
     password: "",
     confirmPassword: "",
   });
@@ -61,14 +53,7 @@ export function SignUp() {
   };
 
   const validateFields = () => {
-    const requiredFields = [
-      "name",
-      "email",
-      "displayName",
-      "phoneNumber",
-      "address",
-      "role",
-    ];
+    const requiredFields = ["name", "email", "phoneNumber", "address"];
 
     for (const field of requiredFields) {
       if (!formData[field]) {
@@ -102,22 +87,17 @@ export function SignUp() {
 
       const user = userCredential.user;
 
-      await updateProfile(user, {
-        displayName: formData.displayName,
-      });
-
       const userDocRef = await addDoc(collection(db, "admin-datas"), {
         name: formData.name,
         email: formData.email,
         phoneNumber: formData.phoneNumber,
         address: formData.address,
-        role: formData.role,
         createdAt: serverTimestamp(),
+        userValidated: false,
       });
 
       setLoading(false);
-      console.log("User signed up successfully!", user);
-      navigate("/auth/sign-in");
+      navigate("/auth/sign-in", { state: { userCreated: true } });
     } catch (error) {
       setLoading(false);
       console.error("Error signing up:", error.message);
@@ -144,17 +124,9 @@ export function SignUp() {
           </CardHeader>
           <form onSubmit={submitHandler}>
             <CardBody className="flex flex-col gap-4">
-              {/* TODO: ADD DISPLAY NAME, MOBILE NUMBER, ADDRESS, ROLE */}
               <Input
                 onChange={(e) => handleInputChange("name", e.target.value)}
-                label="Full Name"
-                size="lg"
-              />
-              <Input
-                onChange={(e) =>
-                  handleInputChange("displayName", e.target.value)
-                }
-                label="Display Name"
+                label="Name"
                 size="lg"
               />
               <Input
@@ -179,13 +151,6 @@ export function SignUp() {
                 label="Address"
                 size="lg"
               />
-              <Select
-                label="Select Role"
-                onChange={(value) => handleInputChange("role", value)}
-              >
-                <Option value="admin">Admin</Option>
-                <Option value="staff">Staff</Option>
-              </Select>
               <Input
                 onChange={(e) => handleInputChange("password", e.target.value)}
                 type="password"
@@ -212,7 +177,7 @@ export function SignUp() {
             </CardBody>
             <CardFooter className="pt-0 flex flex-col">
               {loading ? (
-                <Spinner className="h-6 w-6 mr-3 self-center" color="white" /> // Show spinner when loading
+                <Spinner className="h-6 w-6 mr-3 self-center" color="white" />
               ) : (
                 <Button type="submit" variant="gradient" fullWidth>
                   Sign Up
@@ -231,6 +196,13 @@ export function SignUp() {
                   </Typography>
                 </Link>
               </Typography>
+              <Button
+                onClick={() =>
+                  navigate("/auth/sign-in", { state: { userCreated: true } })
+                }
+              >
+                Try
+              </Button>
             </CardFooter>
           </form>
         </Card>

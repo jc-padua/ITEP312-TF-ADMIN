@@ -57,15 +57,8 @@ export const routes = [
         path: "/profile",
         element: <Profile />,
       },
-      // {
-      //   icon: <BellIcon {...icon} />,
-      //   name: "notifactions",
-      //   path: "/notifactions",
-      //   element: <Notifications />,
-      // },
     ],
   },
-  // TODO:
   {
     title: "Logout",
     layout: "auth",
