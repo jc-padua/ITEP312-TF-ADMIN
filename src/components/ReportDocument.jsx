@@ -8,9 +8,7 @@ import {
   StyleSheet,
   Svg,
 } from "@react-pdf/renderer";
-import YDA from "../../public/img/ydao.png";
-
-const loremIpsum30 = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+import YDA from "../../assets/img/ydao.png";
 
 const ReportDocument = () => {
   const Header = () => (

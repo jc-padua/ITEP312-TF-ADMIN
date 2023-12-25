@@ -10,7 +10,7 @@ export function Dashboard() {
     <div className="min-h-screen bg-blue-gray-50/50">
       <Sidenav
         routes={routes}
-        brandImg={"../../public/img/ydao.png"}
+        brandImg={"../../assets/img/ydao.png"}
         brandName="Youth Development Affairs Office"
       />
       <div className="p-4 xl:ml-80">

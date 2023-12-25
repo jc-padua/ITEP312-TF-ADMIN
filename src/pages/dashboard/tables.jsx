@@ -218,7 +218,7 @@ export function Tables() {
     }
   };
 
-  const canSendInvitation = completedUsers.length >= 2;
+  const canSendInvitation = completedUsers.length >= 30;
   return (
     <div className="mt-12 mb-8 flex flex-col gap-12">
       <Card>
@@ -584,7 +584,6 @@ export function Tables() {
                   }))
                 }
               />
-              {/* TODO: CHANGE TO DATE PICKER */}
               <Input
                 type="datetime-local"
                 value={invitationDetails.date}
@@ -595,17 +594,6 @@ export function Tables() {
                   }))
                 }
               />
-              {/* <Input
-                label="Date Start and Due"
-                required
-                value={invitationDetails.date}
-                onChange={(e) =>
-                  setInvitationDetails((prev) => ({
-                    ...prev,
-                    date: e.target.value,
-                  }))
-                }
-              /> */}
               <Select
                 label="Online Platform"
                 value={invitationDetails.platform}

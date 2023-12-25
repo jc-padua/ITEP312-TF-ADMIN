@@ -802,7 +802,7 @@ export function Home() {
 
         doc.line(startX, 130, endX, 130);
 
-        const headerLogo = "../../../public/img/ydao.png";
+        const headerLogo = "../../../assets/img/ydao.png";
         const leftImageWidth = 70;
         const leftImageHeight = 70;
         doc.addImage(
@@ -835,9 +835,6 @@ export function Home() {
 
   return (
     <div className="mt-12 relative">
-      {/*  
-      //* CARDS
-      */}
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
         {statisticsCardsData.map(({ icon, title, footer, ...rest }) => (
           <StatisticsCard
@@ -850,9 +847,6 @@ export function Home() {
           />
         ))}
       </div>
-      {/*  
-      //* CHARTS
-      */}
       <div className="mb-4">
         <Card className="overflow-hidden xl:col-span-2">
           <CardHeader
@@ -1055,9 +1049,6 @@ export function Home() {
           </CardBody>
         </Card>
       </div>
-      {/* 
-      //* EVENT LISTING
-      */}
       <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <Card className="overflow-hidden xl:col-span-full">
           <CardHeader
