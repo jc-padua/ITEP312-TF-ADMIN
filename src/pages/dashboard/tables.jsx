@@ -164,6 +164,7 @@ export function Tables() {
     platform: "",
     platformLink: "",
   });
+  const [date, setDate] = useState("");
 
   const [loading, setLoading] = useState(false);
 
@@ -174,13 +175,26 @@ export function Tables() {
     const templateId = "template_t4vw3ql";
     const publicKey = "D3BeG9S63k40E_WB8";
 
+    const dateFormat = `${new Date(invitationDetails.date).toLocaleDateString(
+      "en-US",
+      {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      },
+    )} ${new Date(invitationDetails.date).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`;
+
     const templateParams = {
       from_name: currentUserName,
       from_email: currentUserEmail,
       to_email: userEmail,
       to_name: userName,
       seminarDetails: invitationDetails.seminarDetails,
-      date: invitationDetails.date,
+      date: dateFormat,
       platform: invitationDetails.platform,
       platformLink: invitationDetails.platformLink,
     };
@@ -545,6 +559,7 @@ export function Tables() {
           </CardFooter>
         </Card>
       </Dialog>
+
       <Dialog
         size="xs"
         open={openInvitation}
@@ -569,7 +584,18 @@ export function Tables() {
                   }))
                 }
               />
+              {/* TODO: CHANGE TO DATE PICKER */}
               <Input
+                type="datetime-local"
+                value={invitationDetails.date}
+                onChange={(e) =>
+                  setInvitationDetails((prev) => ({
+                    ...prev,
+                    date: e.target.value,
+                  }))
+                }
+              />
+              {/* <Input
                 label="Date Start and Due"
                 required
                 value={invitationDetails.date}
@@ -579,7 +605,7 @@ export function Tables() {
                     date: e.target.value,
                   }))
                 }
-              />
+              /> */}
               <Select
                 label="Online Platform"
                 value={invitationDetails.platform}

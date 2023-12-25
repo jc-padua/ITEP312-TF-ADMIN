@@ -163,6 +163,7 @@ export function Profile() {
           phoneNumber: currentUser.phoneNumber,
           email: currentUser.email,
           address: currentUser.address,
+          userValidated: true,
         });
       }
 

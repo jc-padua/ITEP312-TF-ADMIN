@@ -196,13 +196,6 @@ export function SignUp() {
                   </Typography>
                 </Link>
               </Typography>
-              <Button
-                onClick={() =>
-                  navigate("/auth/sign-in", { state: { userCreated: true } })
-                }
-              >
-                Try
-              </Button>
             </CardFooter>
           </form>
         </Card>
