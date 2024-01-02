@@ -229,7 +229,7 @@ export function Profile() {
     <>
       <Card className="mt-12 mb-8 flex flex-col gap-12">
         <CardHeader>
-          <div className="relative h-72 w-full  rounded-xl bg-[url('./img/bgbanner.jpg')] bg-cover bg-center ">
+          <div className="relative h-72 w-full  rounded-xl bg-[url('/img/bgbanner.jpg')] bg-cover bg-center ">
             <div className="absolute h-full w-full" />
           </div>
         </CardHeader>
@@ -309,7 +309,7 @@ export function Profile() {
         size={400}
       >
         <img
-          src="./img/ydao.png"
+          src="/img/ydao.png"
           style={{
             maxWidth: "100%",
             width: "10rem",
@@ -472,7 +472,7 @@ export function Profile() {
             </div>
           </div>
           <img
-            src="./img/ydao.png"
+            src="/img/ydao.png"
             style={{
               maxWidth: "100%",
               width: "15rem",
