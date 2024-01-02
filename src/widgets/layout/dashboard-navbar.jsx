@@ -48,7 +48,7 @@ export function DashboardNavbar() {
       blurred={fixedNavbar}
     >
       <div className="flex flex-col-reverse justify-end gap-6 md:flex-row md:items-center">
-        <div className="flex items-center ">
+        <div className="flex items-center justify-end ">
           <IconButton
             variant="text"
             color="blue-gray"
