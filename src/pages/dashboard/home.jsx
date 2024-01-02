@@ -802,7 +802,7 @@ export function Home() {
 
         doc.line(startX, 130, endX, 130);
 
-        const headerLogo = "../../../assets/img/ydao.png";
+        const headerLogo = "/img/ydao.png";
         const leftImageWidth = 70;
         const leftImageHeight = 70;
         doc.addImage(

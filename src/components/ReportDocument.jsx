@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Svg,
 } from "@react-pdf/renderer";
-import YDA from "../../assets/img/ydao.png";
+import YDA from "/img/ydao.png";
 
 const ReportDocument = () => {
   const Header = () => (
