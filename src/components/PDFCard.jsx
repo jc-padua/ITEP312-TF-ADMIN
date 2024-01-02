@@ -1,5 +1,5 @@
 import React from "react";
-import YDALOGO from "/img/ydao.png";
+import YDALOGO from "../../assets/img/ydao.png";
 import { Typography, Image } from "@material-tailwind/react";
 
 function PDFCard() {
